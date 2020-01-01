@@ -1,0 +1,267 @@
+// out: default.min.css, compress: true
+
+@base-color: #000;
+@contrast-color: #fff;
+@vibrant-color: #00ffd3;
+@easing: cubic-bezier(0.075, 0.82, 0.165, 1);
+
+.keyframes(@name, @frames) {
+	@-webkit-keyframes @name { @frames(); }
+	@-moz-keyframes @name { @frames(); }
+	@keyframes @name { @frames(); }
+}
+
+.animation(...) {
+	-webkit-animation: @arguments;
+	-moz-animation: @arguments;
+	animation: @arguments;
+}
+
+.transition(...) {
+	-webkit-transition: @arguments;
+	-moz-transition:@arguments;
+	-o-transition: @arguments;
+	transition: @arguments;
+}
+
+.transform(...) {
+	-webkit-transform: @arguments;
+	-moz-transform: @arguments;
+	-ms-transform: @arguments;
+	-o-transform: @arguments;
+	transform: @arguments;
+}
+
+.no-select() {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+body {
+	background: @base-color;
+	font-family: Roboto, Arial;
+	overflow: hidden;
+	.no-select();
+
+	&::after {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		background: url('../picture/cover.jpg') no-repeat center fixed;
+		background-size: cover;
+		opacity: 0;
+		.transform(scale(0.9));
+	}
+
+	&.go {
+		&::after {
+			opacity: 1;
+			.transform(scale(1));
+			.transition(all 4s 1s ease);
+		}
+
+		.preload {
+			opacity: 0;
+			.transition(opacity 1s 1s @easing);
+
+			&::after {
+				.animation(preloading-stop 1s @easing forwards);
+			}
+		}
+
+		.interface {
+			opacity: 1;
+			.transition(opacity 2s 3s ease);
+		}
+
+		.wishes {
+			.transition(opacity 3s 6s ease);
+		}
+	}
+}
+
+.preload {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 200px;
+	height: 30px;
+	margin-left: -100px;
+
+	&::before {
+		content: '';
+		position: absolute;
+		background: fade(@contrast-color, 5%);
+		width: 200px;
+		height: 1px;
+	}
+
+	&::after {
+		content: 'loading..';
+		position: absolute;
+		width: 0px;
+		height: 1px;
+		background: @contrast-color;
+		color: fade(@contrast-color, 5%);
+		font-family: Arial;
+		font-size: 10px;
+		font-weight: bold;
+		line-height: 3;
+		.transition(transform 400ms ease);
+		.animation(preloading-start 4s 500ms @easing forwards);
+	}
+}
+
+.canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.interface {
+	opacity: 0;
+	z-index: 50;
+
+	path {
+		fill: fade(@contrast-color, 20%);
+		.transition(fill 500ms ease);
+	}
+
+	svg:hover {
+		path {
+			fill: @contrast-color;
+		}
+	}
+}
+
+.commands {
+	position: fixed;
+	left: 30px;
+	bottom: 30px;
+
+	input[type="checkbox"] {
+		display: none;
+
+		& + .command {
+			.off {
+				display: block;
+			}
+
+			.on {
+				display: none;
+			}
+		}
+
+		&:checked {
+			& + .command {
+				.on {
+					display: block;
+				}
+
+				.off {
+					display: none;
+				}
+			}
+		}
+	}
+}
+
+.command {
+	position: relative;
+	float: left;
+	width: 20px;
+	height: 20px;
+	margin-right: 10px;
+	cursor: pointer;
+
+	span {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.logo {
+	position: fixed;
+	right: 30px;
+	bottom: 30px;
+	width: 100px;
+	height: 35px;
+}
+
+.info {
+	position: fixed;
+	visibility: hidden;
+	bottom: 70px;
+	left: 30px;
+	width: 300px;
+	padding: 10px 20px;
+	background: @contrast-color;
+	opacity: 0;
+	z-index: 50;
+
+	p {
+		font-size: 13px;
+	}
+
+	a {
+		font-weight: bold;
+		color: darken(@vibrant-color, 10%);
+	}
+}
+
+.wishes {
+	position: absolute;
+	top: 60%;
+	left: 0;
+	right: 0;
+	color: @contrast-color;
+	text-align: center;
+	font-size: 15px;
+	letter-spacing: 2px;
+	line-height: 2;
+}
+
+#info:checked {
+	& ~ .command {
+		path {
+			fill: @contrast-color;
+		}
+	}
+}
+
+.keyframes(preloading-start, {
+	0% {width: 0px; color: fade(@contrast-color, 5%);}
+	20% {width: 40px; color: fade(@contrast-color, 20%);}
+	40% {width: 80px; color: fade(@contrast-color, 40%);}
+	100% {width: 120px; color: fade(@contrast-color, 60%);}
+});
+
+.keyframes(preloading-stop, {
+	0% {width: 120px;  color: fade(@contrast-color, 60%);}
+	100% {width: 200px; color: fade(@contrast-color, 80%);}
+});
+
+@media (max-width: 639px) {
+	.preload {
+		.transition(none);
+
+		&::after {
+			content: 'Sorry, this is a desktop experiment.';
+			width: 100%;
+			color: fade(@contrast-color, 80%);
+			.transition(none);
+			.animation(none);
+		}
+	}
+}
